@@ -1,0 +1,11 @@
+.git
+.gitignore
+.cache
+*.md
+settings.json
+private.key
+.dockerignore
+Dockerfile.dev
+Dockerfile
+node_modules
+Makefile
