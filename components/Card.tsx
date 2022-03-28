@@ -1,6 +1,6 @@
 import Image, { ImageLoader } from 'next/image';
-import Link from 'next/link';
 import { Product } from '../interfaces';
+import { useSession } from 'next-auth/react';
 
 interface Props {
 	product: Product;
@@ -11,36 +11,58 @@ const myLoader: ImageLoader = ({ src }) => {
 };
 
 function Card({ product }: Props) {
+	const { data: session } = useSession();
+
+	const addToFavorites = async (product_id: number) => {
+		const { accessToken } = session;
+		const response = await fetch(`${process.env.BASE_URL}/api/favorites`, {
+			method: 'POST',
+			headers: {
+				Authorization: `Bearer ${accessToken}`,
+				'Content-type': 'application/json',
+			},
+			body: JSON.stringify({
+				product_id,
+			}),
+		});
+		const data = await response.json();
+		console.log(data);
+	};
+
+	const { product_name, price, price_type, product_id, image } = product;
 	return (
-		<div className="flex justify-center">
-			<div className="rounded-lg shadow-lg bg-white max-w-sm">
-				<Link href="#" data-mdb-ripple="true" data-mdb-ripple-color="light">
-					<Image
-						loader={myLoader}
-						className="rounded-t-lg"
-						alt="image"
-						src={product.image}
-						layout="responsive"
-						width={463}
-						height={261}
-					/>
-				</Link>
-				<div className="p-6">
-					<h5 className="text-gray-900 text-xl font-medium mb-2">
-						{product.product_name}
-					</h5>
-					<p className="text-gray-700 text-base mb-4">
-						Some quick example text to build on the card title and make up the
-						bulk of the card's content.
-					</p>
-					<button
-						type="button"
-						className=" inline-block px-6 py-2.5 bg-blue-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out"
-					>
-						Button
-					</button>
-				</div>
-			</div>
+		<div
+			key={product_id}
+			className="flex flex-col items-center justify-center w-full max-w-lg mx-auto"
+		>
+			<Image
+				loader={myLoader}
+				src={image}
+				alt="image"
+				className="object-cover w-full rounded-md h-72 xl:h-80"
+				width={463}
+				height={261}
+			/>
+
+			<h4 className="mt-2 text-lg font-medium text-gray-700 ">
+				{product_name}
+			</h4>
+			<p className="text-blue-500">{`KES.${price} (${price_type})`}</p>
+
+			<button className="flex items-center justify-center w-full px-2 py-2 mt-4 font-medium tracking-wide text-white capitalize transition-colors duration-200 transform bg-gray-800 rounded-md hover:bg-gray-700 focus:outline-none focus:bg-gray-700">
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					className="w-5 h-5 mx-1"
+					viewBox="0 0 20 20"
+					fill="currentColor"
+				>
+					<path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" />
+				</svg>
+				<span className="mx-1">Add to cart</span>
+			</button>
+			<button onClick={() => addToFavorites(product_id)}>
+				Add to favorites
+			</button>
 		</div>
 	);
 }

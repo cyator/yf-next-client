@@ -8,3 +8,8 @@ export interface Product {
 	image: string;
 	quantity: number;
 }
+
+export interface Error {
+	status: number | null;
+	message: string;
+}

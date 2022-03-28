@@ -1,6 +1,6 @@
 dev-build:
 	docker build \
-	-t yf-next-client-dev:0.0.0 \
+	-t yf-next-client-dev:0.0.1 \
 	-f Dockerfile.dev .
 
 staging-build:
