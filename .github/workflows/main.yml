@@ -1,0 +1,28 @@
+name: Build Containers for Prod & Push to Dockerhub
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+ 
+  build-and-deploy:
+    name: Build and Deploy client
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Build & push Docker image
+        uses: mr-smithers-excellent/docker-build-push@v5
+        with:
+          image: cyator/yf-next-client
+          registry: docker.io
+          directory: ./
+          dockerfile: ./Dockerfile
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+          buildArgs: BASE_URL=${{ secrets.BASE_URL}} 
